@@ -1,26 +1,63 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Header from "./presentation/components/Header.jsx";
-import Footer from "./presentation/components/Footer.jsx";
-import MenuLeft from "./presentation/components/MenuLeft.jsx";
-import SinhVienPage from "./presentation/pages/SinhVienPage.jsx";
-import BangDiemPage from "./presentation/pages/BangDiemPage.jsx";
+import DefaultLayout from "./presentation/Layouts/DefaultLayout";
+import { publicRoutes, privateRoutes } from "./presentation/routes";
 
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="flex flex-col h-screen">
-        <Header />
-        <div className="flex flex-1">
-          <MenuLeft />
-          <main className="flex-1 p-4 overflow-y-auto bg-white shadow-inner">
-            <Routes>
-              <Route path="/" element={<SinhVienPage />} />
-              <Route path="/bangdiem" element={<BangDiemPage />} />
-            </Routes>
-          </main>
-        </div>
-        <Footer />
+      <div className="App">
+        <Routes>
+          {/* 🟢 ROUTE CÔNG KHAI */}
+          {publicRoutes.map((route, index) => {
+            const Page = route.component;
+            let Layout = DefaultLayout;
+
+            if (route.layout) {
+              Layout = route.layout;
+            } else if (route.layout === null) {
+              Layout = Fragment;
+            }
+
+            return (
+              <Route
+                key={index}
+                path={route.path}
+                element={
+                  <Layout>
+                    <Page />
+                  </Layout>
+                }
+              />
+            );
+          })}
+
+          {/* 🔒 ROUTE RIÊNG TƯ */}
+          {privateRoutes.map((route, index) => {
+            const Page = route.component;
+            let Layout = DefaultLayout;
+
+            if (route.layout) {
+              Layout = route.layout;
+            } else if (route.layout === null) {
+              Layout = Fragment;
+            }
+
+            return (
+              <Route
+                key={index}
+                path={route.path}
+                element={
+                  <PrivateRoute>
+                    <Layout>
+                      <Page />
+                    </Layout>
+                  </PrivateRoute>
+                }
+              />
+            );
+          })}
+        </Routes>
       </div>
     </BrowserRouter>
   );
